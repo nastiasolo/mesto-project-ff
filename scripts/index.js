@@ -27,6 +27,6 @@ function deleteCard(deleteButton) {
 }
 
 // @todo: Вывести карточки на страницу
-initialCards.forEach((cardElement) => {
-  placesList.append(createCard(cardElement, deleteCard));
+initialCards.forEach((cardData) => {
+  placesList.append(createCard(cardData, deleteCard));
 });
