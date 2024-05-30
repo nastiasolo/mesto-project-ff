@@ -1,8 +1,5 @@
-import { initialCards } from "./cards";
-
 // @todo: Функция создания карточки
 const cardTemplate = document.querySelector("#card-template").content;
-console.log(initialCards);
 
 function createCard(dataCard, deleteCard, likeCard, openImgModal) {
   // @todo: DOM узлы
@@ -23,9 +20,7 @@ function createCard(dataCard, deleteCard, likeCard, openImgModal) {
   });
 
   const img = cardElement.querySelector(".card__image");
-  console.log(img);
   img.addEventListener("click", () => {
-    console.log(dataCard);
     openImgModal(dataCard);
   });
 

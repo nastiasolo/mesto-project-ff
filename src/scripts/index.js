@@ -42,9 +42,6 @@ editProfileButton.addEventListener("click", () => {
 
 //Функция открытия попапа с картинкой
 function openImgModal(cardData) {
-  console.log(cardData.name);
-  console.log(cardData.link);
-  console.log(imgPopupDescription.value);
   imgPopupPicture.src = cardData.link;
   imgPopupPicture.alt = cardData.name;
   imgPopupDescription.textContent = cardData.name;
@@ -74,7 +71,6 @@ function handleAddForm(evt) {
     link: placeUrlInput.value,
   };
   placesList.prepend(createCard(place, deleteCard, likeCard, openImgModal));
-  console.log(initialCards);
   evt.target.reset();
   closeModal(newCardPopup);
 }
@@ -92,5 +88,3 @@ popupCloseButtonList.forEach((btn) => {
 document.querySelectorAll(".popup").forEach((elem) => {
   elem.classList.add("popup_is-animated");
 });
-
-export { openImgModal };
