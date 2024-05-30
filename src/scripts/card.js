@@ -1,7 +1,10 @@
-// @todo: Функция создания карточки
-import { cardTemplate } from "./index";
+import { initialCards } from "./cards";
 
-function createCard(dataCard, deleteCard, likeCard) {
+// @todo: Функция создания карточки
+const cardTemplate = document.querySelector("#card-template").content;
+console.log(initialCards);
+
+function createCard(dataCard, deleteCard, likeCard, openImgModal) {
   // @todo: DOM узлы
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
 
@@ -17,6 +20,13 @@ function createCard(dataCard, deleteCard, likeCard) {
   const likeButton = cardElement.querySelector(".card__like-button");
   likeButton.addEventListener("click", () => {
     likeCard(likeButton);
+  });
+
+  const img = cardElement.querySelector(".card__image");
+  console.log(img);
+  img.addEventListener("click", () => {
+    console.log(dataCard);
+    openImgModal(dataCard);
   });
 
   return cardElement;

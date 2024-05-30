@@ -5,7 +5,7 @@ import { openModal, closeModal } from "./modal";
 
 // @todo: Темплейт карточки
 const placesList = document.querySelector(".places__list");
-const cardTemplate = document.querySelector("#card-template").content;
+
 const editProfileButton = document.querySelector(".profile__edit-button");
 const profilePopup = document.querySelector(".popup_type_edit");
 const popupCloseButtonList = document.querySelectorAll(".popup__close");
@@ -13,20 +13,24 @@ const popupCloseButtonList = document.querySelectorAll(".popup__close");
 const newCardPopupButton = document.querySelector(".profile__add-button");
 const newCardPopup = document.querySelector(".popup_type_new-card");
 
-let profileTitle = document.querySelector(".profile__title");
-let profileDescription = document.querySelector(".profile__description");
+const profileTitle = document.querySelector(".profile__title");
+const profileDescription = document.querySelector(".profile__description");
 
 const formElement = document.forms["edit-profile"];
-let nameInput = document.querySelector(".popup__input_type_name");
-let jobInput = document.querySelector(".popup__input_type_description");
+const nameInput = document.querySelector(".popup__input_type_name");
+const jobInput = document.querySelector(".popup__input_type_description");
 
 const addForm = document.forms["new-place"];
 let placeNameInput = document.querySelector(".popup__input_type_card-name");
 let placeUrlInput = document.querySelector(".popup__input_type_url");
 
+const imgPopup = document.querySelector(".popup_type_image");
+const imgPopupPicture = document.querySelector(".popup__image");
+const imgPopupDescription = document.querySelector(".popup__caption");
+
 // @todo: Вывести карточки на страницу
 initialCards.forEach((cardData) => {
-  placesList.append(createCard(cardData, deleteCard, likeCard));
+  placesList.append(createCard(cardData, deleteCard, likeCard, openImgModal));
 });
 
 //Открыть модальное окно
@@ -36,9 +40,20 @@ editProfileButton.addEventListener("click", () => {
   openModal(profilePopup);
 });
 
+//Функция открытия попапа с картинкой
+function openImgModal(cardData) {
+  console.log(cardData.name);
+  console.log(cardData.link);
+  console.log(imgPopupDescription.value);
+  imgPopupPicture.src = cardData.link;
+  imgPopupPicture.alt = cardData.name;
+  imgPopupDescription.textContent = cardData.name;
+  openModal(imgPopup);
+}
+
 // Обработчик «отправки» формы, хотя пока
 // она никуда отправляться не будет
-function handleFormSubmit(evt) {
+function handleProfileSubmit(evt) {
   evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
   // Получите значение полей jobInput и nameInput из свойства value
   // Выберите элементы, куда должны быть вставлены значения полей
@@ -50,7 +65,7 @@ function handleFormSubmit(evt) {
 
 // Прикрепляем обработчик к форме:
 // он будет следить за событием “submit” - «отправка»
-formElement.addEventListener("submit", handleFormSubmit);
+formElement.addEventListener("submit", handleProfileSubmit);
 
 function handleAddForm(evt) {
   evt.preventDefault();
@@ -58,10 +73,9 @@ function handleAddForm(evt) {
     name: placeNameInput.value,
     link: placeUrlInput.value,
   };
-  placesList.prepend(createCard(place, deleteCard, likeCard));
+  placesList.prepend(createCard(place, deleteCard, likeCard, openImgModal));
   console.log(initialCards);
-  placeNameInput.value = "";
-  placeUrlInput.value = "";
+  evt.target.reset();
   closeModal(newCardPopup);
 }
 
@@ -75,29 +89,8 @@ popupCloseButtonList.forEach((btn) => {
   btn.addEventListener("click", () => closeModal(closestPopup));
 });
 
-//Закрыть модальное окно по клику на оверлей
-profilePopup.addEventListener("click", (evt) => {
-  if (evt.target === evt.currentTarget) {
-    closeModal(evt.target);
-  }
-});
-
-newCardPopup.addEventListener("click", (evt) => {
-  if (evt.target === evt.currentTarget) {
-    closeModal(evt.target);
-  }
-});
-
-//Закрыть модальное окно по кнопке Esc
-document.addEventListener("keydown", function (evt) {
-  if (evt.key === "Escape" && document.querySelector(".popup_is-opened")) {
-    closeModal(document.querySelector(".popup_is-opened"));
-    document.removeEventListener("keydown", closeModal);
-  }
-});
-
 document.querySelectorAll(".popup").forEach((elem) => {
   elem.classList.add("popup_is-animated");
 });
 
-export { cardTemplate };
+export { openImgModal };
