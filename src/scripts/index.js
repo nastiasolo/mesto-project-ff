@@ -21,8 +21,8 @@ const nameInput = document.querySelector(".popup__input_type_name");
 const jobInput = document.querySelector(".popup__input_type_description");
 
 const addForm = document.forms["new-place"];
-let placeNameInput = document.querySelector(".popup__input_type_card-name");
-let placeUrlInput = document.querySelector(".popup__input_type_url");
+const placeNameInput = document.querySelector(".popup__input_type_card-name");
+const placeUrlInput = document.querySelector(".popup__input_type_url");
 
 const imgPopup = document.querySelector(".popup_type_image");
 const imgPopupPicture = document.querySelector(".popup__image");

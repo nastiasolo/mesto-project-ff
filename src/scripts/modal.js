@@ -9,6 +9,7 @@ function openModal(popup) {
 
 function closeModal(popup) {
   popup.classList.remove("popup_is-opened");
+  popup.removeEventListener("click", closeByOverlay);
   document.removeEventListener("keydown", closeByEscape);
 }
 
