@@ -2,6 +2,7 @@ import "../pages/index.css"; // добавьте импорт главного �
 import { initialCards } from "./cards";
 import { createCard, deleteCard, likeCard } from "./card";
 import { openModal, closeModal } from "./modal";
+import { enableValidation, clearValidation } from "./validation";
 
 // @todo: Темплейт карточки
 const placesList = document.querySelector(".places__list");
@@ -16,7 +17,7 @@ const newCardPopup = document.querySelector(".popup_type_new-card");
 const profileTitle = document.querySelector(".profile__title");
 const profileDescription = document.querySelector(".profile__description");
 
-const formElement = document.forms["edit-profile"];
+const profileForm = document.forms["edit-profile"];
 const nameInput = document.querySelector(".popup__input_type_name");
 const jobInput = document.querySelector(".popup__input_type_description");
 
@@ -28,6 +29,15 @@ const imgPopup = document.querySelector(".popup_type_image");
 const imgPopupPicture = document.querySelector(".popup__image");
 const imgPopupDescription = document.querySelector(".popup__caption");
 
+const validationConfig = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+};
+
 // @todo: Вывести карточки на страницу
 initialCards.forEach((cardData) => {
   placesList.append(createCard(cardData, deleteCard, likeCard, openImgModal));
@@ -38,6 +48,7 @@ editProfileButton.addEventListener("click", () => {
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
   openModal(profilePopup);
+  clearValidation(profileForm, validationConfig);
 });
 
 //Функция открытия попапа с картинкой
@@ -46,6 +57,7 @@ function openImgModal(cardData) {
   imgPopupPicture.alt = cardData.name;
   imgPopupDescription.textContent = cardData.name;
   openModal(imgPopup);
+  clearValidation(profileForm, validationConfig);
 }
 
 // Обработчик «отправки» формы, хотя пока
@@ -62,7 +74,7 @@ function handleProfileSubmit(evt) {
 
 // Прикрепляем обработчик к форме:
 // он будет следить за событием “submit” - «отправка»
-formElement.addEventListener("submit", handleProfileSubmit);
+profileForm.addEventListener("submit", handleProfileSubmit);
 
 function handleAddForm(evt) {
   evt.preventDefault();
@@ -72,6 +84,7 @@ function handleAddForm(evt) {
   };
   placesList.prepend(createCard(place, deleteCard, likeCard, openImgModal));
   evt.target.reset();
+  clearValidation(addForm, validationConfig);
   closeModal(newCardPopup);
 }
 
@@ -88,3 +101,22 @@ popupCloseButtonList.forEach((btn) => {
 document.querySelectorAll(".popup").forEach((elem) => {
   elem.classList.add("popup_is-animated");
 });
+
+enableValidation(validationConfig);
+
+//Обращение к серверу
+function addProfileInfo(container, markup) {}
+
+fetch("https://nomoreparties.co/v1/wff-cohort-16/users/me", {
+  headers: {
+    authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
+  },
+})
+  .then((res) => res.json())
+  .then((result) => {
+    console.log(result);
+    console.log(result.name);
+    console.log(nameInput);
+    profileTitle.textContent = result.name;
+    profileDescription.textContent = result.about;
+  });

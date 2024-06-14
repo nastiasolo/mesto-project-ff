@@ -1,0 +1,17 @@
+.popup__input-error {
+  display: none;
+}
+
+.popup__input-error_active {
+  color: red;
+  display: block;
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.popup__input_type_error {
+  border-bottom: 1px solid red;
+}
