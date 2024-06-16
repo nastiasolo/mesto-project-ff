@@ -20,12 +20,15 @@
       </header>
       <main class="content">
         <section class="profile page__section">
-          <div
-            class="profile__image"
-            style="
-              background-image: url('<%= require('./images/avatar.jpg') %>');
-            "
-          ></div>
+          <div class="profile__image-container">
+            <div class="profile__image-overlay"></div>
+            <div
+              class="profile__image"
+              style="
+                background-image: url('<%= require('./images/avatar.jpg') %>');
+              "
+            ></div>
+          </div>
           <div class="profile__info">
             <h1 class="profile__title">Жак-Ив Кусто</h1>
             <button class="profile__edit-button" type="button"></button>
@@ -117,6 +120,25 @@
           <p class="popup__caption"></p>
         </div>
       </div>
+      <div class="popup popup_type_editprofile-image">
+        <div class="popup__content popup__content_profile-image">
+          <button type="button" class="popup__close"></button>
+          <h3 class="popup__title">Обновить аватар</h3>
+          <form class="popup__form" name="new-profile-image">
+            <input
+              type="url"
+              name="profile-image"
+              class="popup__input popup__input_type_profile-image"
+              placeholder="Ссылка на картинку"
+              id="link"
+              required
+            />
+            <span class="popup__input-error link-input-error"></span>
+            <button type="submit" class="button popup__button">
+              Сохранить
+            </button>
+        </div>
+      </div>
     </div>
 
     <template id="card-template">
@@ -125,7 +147,10 @@
         <button type="button" class="card__delete-button"></button>
         <div class="card__description">
           <h2 class="card__title"></h2>
-          <button type="button" class="card__like-button"></button>
+          <div class="card__like">
+            <button type="button" class="card__like-button"></button>
+            <span class="card__like-count"></span>
+          </div>
         </div>
       </li>
     </template>
