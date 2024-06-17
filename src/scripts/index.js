@@ -79,8 +79,6 @@ function openImgModal(cardData) {
 
 loadCardsData()
   .then(([profileData, cardsData]) => {
-    console.log("Инфа с сервера о пользователе", profileData);
-    console.log("Инфа с сервера с массивом карточек", cardsData);
     profileTitle.textContent = profileData.name;
     profileDescription.textContent = profileData.about;
     profilePic.style.backgroundImage = `url(${profileData.avatar})`;
@@ -118,7 +116,6 @@ function handleProfileImageSubmit(evt) {
   ).textContent = "Сохранение...";
   sendProfileImage(profilePicInput)
     .then((result) => {
-      console.log(result);
       profilePictureForm.querySelector(
         validationConfig.submitButtonSelector
       ).textContent = "Сохранить";
@@ -146,7 +143,6 @@ function handleAddForm(evt) {
         _id: result._id,
         owner: { _id: result.owner._id },
       };
-      console.log("Переменная плейс", place);
       placesList.prepend(
         createCard(place, result.owner, deleteCard, likeCard, openImgModal)
       );

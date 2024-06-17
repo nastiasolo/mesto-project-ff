@@ -23,8 +23,7 @@ function createCard(dataCard, profileData, deleteCard, likeCard, openImgModal) {
   });
 
   const likeButton = cardElement.querySelector(".card__like-button");
-  console.log("Инфа о карточке!", dataCard);
-  console.log("Инфа о профиле!", profileData);
+
   if (dataCard.likes.some((obj) => obj._id === profileData._id)) {
     likeButton.classList.add("card__like-button_is-active");
   }
@@ -58,11 +57,9 @@ function deleteCard(deleteButton, cardId, dataCard) {
 
 //Функция лайканья карточки
 function likeCard(likeButton, cardId, cardElement, dataCard) {
-  console.log("Кард.айди", cardId);
   sendLikes(cardId, dataCard)
     .then((result) => {
       dataCard.likes = result.likes;
-      console.log("Инфа о лайкнутой карточке с сервера", result);
       cardElement.querySelector(".card__like-count").textContent =
         result.likes.length;
       likeButton.classList.toggle("card__like-button_is-active");
@@ -76,7 +73,6 @@ function deleteCardLike(likeButton, cardId, cardElement, dataCard) {
   deleteLikes(cardId, dataCard)
     .then((result) => {
       dataCard.likes = result.likes;
-      console.log("Инфа от сервера после удаления лайка", result);
       cardElement.querySelector(".card__like-count").textContent =
         result.likes.length;
       likeButton.classList.toggle("card__like-button_is-active");
