@@ -1,5 +1,5 @@
+import { sendDeleteCard, sendLikes, deleteLikes } from "./api";
 // @todo: Функция создания карточки
-import { sendDeleteCard } from "./api";
 const cardTemplate = document.querySelector("#card-template").content;
 
 function createCard(dataCard, profileData, deleteCard, likeCard, openImgModal) {
@@ -19,14 +19,21 @@ function createCard(dataCard, profileData, deleteCard, likeCard, openImgModal) {
   }
 
   deleteButton.addEventListener("click", () => {
-    console.log("Айди удаляемой карточки", dataCard._id);
     deleteCard(deleteButton, dataCard._id);
   });
 
   const likeButton = cardElement.querySelector(".card__like-button");
+  console.log("Инфа о карточке!", dataCard);
+  console.log("Инфа о профиле!", profileData);
+  if (dataCard.likes.some((obj) => obj._id === profileData._id)) {
+    likeButton.classList.add("card__like-button_is-active");
+  }
   likeButton.addEventListener("click", () => {
-    console.log("Айди лайкнутой карточки", dataCard._id);
-    likeCard(likeButton, dataCard._id);
+    if (dataCard.likes.some((obj) => obj._id === profileData._id)) {
+      deleteCardLike(likeButton, dataCard._id, cardElement, dataCard);
+    } else {
+      likeCard(likeButton, dataCard._id, cardElement, dataCard);
+    }
   });
 
   const img = cardElement.querySelector(".card__image");
@@ -38,21 +45,10 @@ function createCard(dataCard, profileData, deleteCard, likeCard, openImgModal) {
 }
 
 // @todo: Функция удаления карточки
-function deleteCard(deleteButton, cardId) {
-  // fetch(`https://nomoreparties.co/v1/wff-cohort-16/cards/${cardId}`, {
-  //   method: "DELETE",
-  //   headers: {
-  //     authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-  //     "Content-Type": "application/json",
-  //   },
-  // })
-  //   .then((res) => res.json())
-  sendDeleteCard(cardId)
-    .then((result) => {
-      //форичем может искать по айди и удалять из дома
-      console.log(result);
+function deleteCard(deleteButton, cardId, dataCard) {
+  sendDeleteCard(cardId, dataCard)
+    .then(() => {
       const listItem = deleteButton.closest(".places__item");
-      console.log(listItem);
       listItem.remove();
     })
     .catch((err) => {
@@ -61,19 +57,32 @@ function deleteCard(deleteButton, cardId) {
 }
 
 //Функция лайканья карточки
-function likeCard(likeButton, cardId) {
-  fetch(`https://nomoreparties.co/v1/wff-cohort-16/cards/likes/${cardId}`, {
-    method: "PUT",
-    headers: {
-      authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((res) => res.json())
+function likeCard(likeButton, cardId, cardElement, dataCard) {
+  console.log("Кард.айди", cardId);
+  sendLikes(cardId, dataCard)
     .then((result) => {
+      dataCard.likes = result.likes;
       console.log("Инфа о лайкнутой карточке с сервера", result);
+      cardElement.querySelector(".card__like-count").textContent =
+        result.likes.length;
       likeButton.classList.toggle("card__like-button_is-active");
-      console.log(result.likes.length);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function deleteCardLike(likeButton, cardId, cardElement, dataCard) {
+  deleteLikes(cardId, dataCard)
+    .then((result) => {
+      dataCard.likes = result.likes;
+      console.log("Инфа от сервера после удаления лайка", result);
+      cardElement.querySelector(".card__like-count").textContent =
+        result.likes.length;
+      likeButton.classList.toggle("card__like-button_is-active");
+    })
+    .catch((err) => {
+      console.log(err);
     });
 }
 

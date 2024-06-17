@@ -52,10 +52,41 @@ export const sendProfileImage = (profilePicInput) => {
   });
 };
 
-//добавить пост реквест
+export const postNewCard = (placeNameInput, placeUrlInput) => {
+  return fetch(`${apiConfig.baseUrl}/cards`, {
+    method: "POST",
+    headers: apiConfig.headers,
+    body: JSON.stringify({
+      name: placeNameInput.value,
+      link: placeUrlInput.value,
+    }),
+  }).then((res) => res.json());
+};
 
 export const sendDeleteCard = (cardId) => {
   return fetch(`${apiConfig.baseUrl}/cards/${cardId}`, {
+    method: "DELETE",
+    headers: apiConfig.headers,
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+  });
+};
+
+export const sendLikes = (cardId) => {
+  return fetch(`${apiConfig.baseUrl}/cards/likes/${cardId}`, {
+    method: "PUT",
+    headers: apiConfig.headers,
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+  });
+};
+
+export const deleteLikes = (cardId) => {
+  return fetch(`${apiConfig.baseUrl}/cards/likes/${cardId}`, {
     method: "DELETE",
     headers: apiConfig.headers,
   }).then((res) => {

@@ -2,7 +2,12 @@ import "../pages/index.css"; // добавьте импорт главного �
 import { createCard, deleteCard, likeCard } from "./card";
 import { openModal, closeModal } from "./modal";
 import { enableValidation, clearValidation } from "./validation";
-import { loadCardsData, sendProfileData, sendProfileImage } from "./api";
+import {
+  loadCardsData,
+  sendProfileData,
+  sendProfileImage,
+  postNewCard,
+} from "./api";
 
 // @todo: Темплейт карточки
 const placesList = document.querySelector(".places__list");
@@ -27,7 +32,6 @@ const profilePic = document.querySelector(".profile__image");
 const profilePicInput = document.querySelector(
   ".popup__input_type_profile-image"
 );
-console.log(profilePicInput);
 
 const profileForm = document.forms["edit-profile"];
 const nameInput = document.querySelector(".popup__input_type_name");
@@ -36,7 +40,6 @@ const jobInput = document.querySelector(".popup__input_type_description");
 const addForm = document.forms["new-place"];
 const placeNameInput = document.querySelector(".popup__input_type_card-name");
 const placeUrlInput = document.querySelector(".popup__input_type_url");
-const likeCount = document.querySelector(".card__like-count");
 
 const imgPopup = document.querySelector(".popup_type_image");
 const imgPopupPicture = document.querySelector(".popup__image");
@@ -74,19 +77,6 @@ function openImgModal(cardData) {
   clearValidation(profileForm, validationConfig);
 }
 
-// function loadCardsData() {
-//   Promise.all([
-//     fetch("https://nomoreparties.co/v1/wff-cohort-16/users/me", {
-//       headers: {
-//         authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-//       },
-//     }).then((res) => res.json()),
-//     fetch("https://nomoreparties.co/v1/wff-cohort-16/cards", {
-//       headers: {
-//         authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-//       },
-//     }).then((res) => res.json()),
-//   ])
 loadCardsData()
   .then(([profileData, cardsData]) => {
     console.log("Инфа с сервера о пользователе", profileData);
@@ -104,26 +94,16 @@ loadCardsData()
   .catch((err) => {
     console.log(err);
   });
-// }
-
-// loadCardsData();
 
 // Обработчик «отправки» формы профиля
 function handleProfileSubmit(evt) {
-  evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
-  // fetch("https://nomoreparties.co/v1/wff-cohort-16/users/me", {
-  //   method: "PATCH",
-  //   headers: {
-  //     authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     name: nameInput.value,
-  //     about: jobInput.value,
-  //   }),
-  // })
-  //   .then((res) => res.json())
+  evt.preventDefault();
+  profileForm.querySelector(validationConfig.submitButtonSelector).textContent =
+    "Сохранение...";
   sendProfileData(nameInput, jobInput).then((result) => {
+    profileForm.querySelector(
+      validationConfig.submitButtonSelector
+    ).textContent = "Сохранить";
     profileTitle.textContent = result.name;
     profileDescription.textContent = result.about;
     closeModal(profilePopup);
@@ -133,20 +113,15 @@ function handleProfileSubmit(evt) {
 //Меняем аватар
 function handleProfileImageSubmit(evt) {
   evt.preventDefault();
-  // fetch("https://nomoreparties.co/v1/wff-cohort-16/users/me/avatar", {
-  //   method: "PATCH",
-  //   headers: {
-  //     authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     avatar: profilePicInput.value,
-  //   }),
-  // })
-  //   .then((res) => res.json())
+  profilePictureForm.querySelector(
+    validationConfig.submitButtonSelector
+  ).textContent = "Сохранение...";
   sendProfileImage(profilePicInput)
     .then((result) => {
       console.log(result);
+      profilePictureForm.querySelector(
+        validationConfig.submitButtonSelector
+      ).textContent = "Сохранить";
       profilePic.style.backgroundImage = `url(${result.avatar})`;
       closeModal(profilePicturePopup);
     })
@@ -154,35 +129,24 @@ function handleProfileImageSubmit(evt) {
       console.log(err);
     });
 }
-// Прикрепляем обработчик к форме:
-// он будет следить за событием “submit” - «отправка»
-profileForm.addEventListener("submit", handleProfileSubmit);
-profilePictureForm.addEventListener("submit", handleProfileImageSubmit);
 
 function handleAddForm(evt) {
   evt.preventDefault();
-  fetch("https://nomoreparties.co/v1/wff-cohort-16/cards", {
-    method: "POST",
-    headers: {
-      authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: placeNameInput.value,
-      link: placeUrlInput.value,
-    }),
-  })
-    .then((res) => res.json())
+  addForm.querySelector(validationConfig.submitButtonSelector).textContent =
+    "Сохранение...";
+  postNewCard(placeNameInput, placeUrlInput)
     .then((result) => {
+      addForm.querySelector(validationConfig.submitButtonSelector).textContent =
+        "Сохранить";
       console.log("Инфа при добавлении фото из формы", result);
-      console.log(result.owner._id);
-      profileTitle.textContent = result.name;
       const place = {
         name: result.name,
         link: result.link,
-        id: result._id,
-        likes: result.likes.length,
+        likes: [],
+        _id: result._id,
+        owner: { _id: result.owner._id },
       };
+      console.log("Переменная плейс", place);
       placesList.prepend(
         createCard(place, result.owner, deleteCard, likeCard, openImgModal)
       );
@@ -195,6 +159,10 @@ function handleAddForm(evt) {
     });
 }
 
+// Прикрепляем обработчик к форме:
+// он будет следить за событием “submit” - «отправка»
+profileForm.addEventListener("submit", handleProfileSubmit);
+profilePictureForm.addEventListener("submit", handleProfileImageSubmit);
 addForm.addEventListener("submit", handleAddForm);
 
 newCardPopupButton.addEventListener("click", () => openModal(newCardPopup));
