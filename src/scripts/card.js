@@ -2,19 +2,20 @@ import { sendDeleteCard, sendLikes, deleteLikes } from "./api";
 // @todo: Функция создания карточки
 const cardTemplate = document.querySelector("#card-template").content;
 
-function createCard(dataCard, profileData, deleteCard, likeCard, openImgModal) {
+function createCard(dataCard, profileId, deleteCard, likeCard, openImgModal) {
   // @todo: DOM узлы
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
 
-  cardElement.querySelector(".card__image").src = dataCard.link;
-  cardElement.querySelector(".card__image").alt = dataCard.name;
+  const img = cardElement.querySelector(".card__image");
+  img.src = dataCard.link;
+  img.alt = dataCard.name;
   cardElement.querySelector(".card__title").textContent = dataCard.name;
   cardElement.querySelector(".card__like-count").textContent =
     dataCard.likes.length;
 
   const deleteButton = cardElement.querySelector(".card__delete-button");
 
-  if (dataCard.owner._id !== profileData._id) {
+  if (dataCard.owner._id !== profileId) {
     deleteButton.style.visibility = "hidden";
   }
 
@@ -24,18 +25,17 @@ function createCard(dataCard, profileData, deleteCard, likeCard, openImgModal) {
 
   const likeButton = cardElement.querySelector(".card__like-button");
 
-  if (dataCard.likes.some((obj) => obj._id === profileData._id)) {
+  if (dataCard.likes.some((obj) => obj._id === profileId)) {
     likeButton.classList.add("card__like-button_is-active");
   }
   likeButton.addEventListener("click", () => {
-    if (dataCard.likes.some((obj) => obj._id === profileData._id)) {
+    if (dataCard.likes.some((obj) => obj._id === profileId)) {
       deleteCardLike(likeButton, dataCard._id, cardElement, dataCard);
     } else {
       likeCard(likeButton, dataCard._id, cardElement, dataCard);
     }
   });
 
-  const img = cardElement.querySelector(".card__image");
   img.addEventListener("click", () => {
     openImgModal(dataCard);
   });

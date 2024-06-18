@@ -3,6 +3,7 @@ import { createCard, deleteCard, likeCard } from "./card";
 import { openModal, closeModal } from "./modal";
 import { enableValidation, clearValidation } from "./validation";
 import {
+  loadUserData,
   loadCardsData,
   sendProfileData,
   sendProfileImage,
@@ -12,9 +13,9 @@ import {
 // @todo: Темплейт карточки
 const placesList = document.querySelector(".places__list");
 
-const editProfileButton = document.querySelector(".profile__edit-button");
+const buttonOpenPopupProfile = document.querySelector(".profile__edit-button");
 const profilePopup = document.querySelector(".popup_type_edit");
-const popupCloseButtonList = document.querySelectorAll(".popup__close");
+const buttonListClosePopup = document.querySelectorAll(".popup__close");
 
 const profilePicture = document.querySelector(".profile__image-container");
 const profilePicturePopup = document.querySelector(
@@ -22,7 +23,7 @@ const profilePicturePopup = document.querySelector(
 );
 const profilePictureForm = document.forms["new-profile-image"];
 
-const newCardPopupButton = document.querySelector(".profile__add-button");
+const buttonNewCardPopup = document.querySelector(".profile__add-button");
 const newCardPopup = document.querySelector(".popup_type_new-card");
 
 const profileTitle = document.querySelector(".profile__title");
@@ -49,13 +50,21 @@ const validationConfig = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
-  inactiveButtonClass: "popup__button_disabled",
+  inactiveButtonClass: "popup__button_inactive",
   inputErrorClass: "popup__input_type_error",
-  errorClass: "popup__error_visible",
+  errorClass: "popup__input-error_active",
+};
+
+const apiConfig = {
+  baseUrl: "https://nomoreparties.co/v1/wff-cohort-16",
+  headers: {
+    authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
+    "Content-Type": "application/json",
+  },
 };
 
 //Открыть модальное окно редактирования профиля
-editProfileButton.addEventListener("click", () => {
+buttonOpenPopupProfile.addEventListener("click", () => {
   nameInput.value = profileTitle.textContent;
   jobInput.value = profileDescription.textContent;
   openModal(profilePopup);
@@ -74,10 +83,10 @@ function openImgModal(cardData) {
   imgPopupPicture.alt = cardData.name;
   imgPopupDescription.textContent = cardData.name;
   openModal(imgPopup);
-  clearValidation(profileForm, validationConfig);
+  clearValidation(profilePictureForm, validationConfig);
 }
 
-loadCardsData()
+Promise.all([loadUserData(apiConfig), loadCardsData(apiConfig)])
   .then(([profileData, cardsData]) => {
     profileTitle.textContent = profileData.name;
     profileDescription.textContent = profileData.about;
@@ -85,7 +94,7 @@ loadCardsData()
     // @todo: Вывести карточки на страницу
     cardsData.forEach((card) => {
       placesList.append(
-        createCard(card, profileData, deleteCard, likeCard, openImgModal)
+        createCard(card, profileData._id, deleteCard, likeCard, openImgModal)
       );
     });
   })
@@ -98,14 +107,23 @@ function handleProfileSubmit(evt) {
   evt.preventDefault();
   profileForm.querySelector(validationConfig.submitButtonSelector).textContent =
     "Сохранение...";
-  sendProfileData(nameInput, jobInput).then((result) => {
-    profileForm.querySelector(
-      validationConfig.submitButtonSelector
-    ).textContent = "Сохранить";
-    profileTitle.textContent = result.name;
-    profileDescription.textContent = result.about;
-    closeModal(profilePopup);
-  });
+  sendProfileData(nameInput, jobInput)
+    .then((result) => {
+      profileForm.querySelector(
+        validationConfig.submitButtonSelector
+      ).textContent = "Сохранить";
+      profileTitle.textContent = result.name;
+      profileDescription.textContent = result.about;
+      closeModal(profilePopup);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      profileForm.querySelector(
+        validationConfig.submitButtonSelector
+      ).textContent = "Сохранить";
+    });
 }
 
 //Меняем аватар
@@ -124,6 +142,11 @@ function handleProfileImageSubmit(evt) {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      profileForm.querySelector(
+        validationConfig.submitButtonSelector
+      ).textContent = "Сохранить";
     });
 }
 
@@ -152,6 +175,11 @@ function handleAddForm(evt) {
     })
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      profileForm.querySelector(
+        validationConfig.submitButtonSelector
+      ).textContent = "Сохранить";
     });
 }
 
@@ -161,10 +189,10 @@ profileForm.addEventListener("submit", handleProfileSubmit);
 profilePictureForm.addEventListener("submit", handleProfileImageSubmit);
 addForm.addEventListener("submit", handleAddForm);
 
-newCardPopupButton.addEventListener("click", () => openModal(newCardPopup));
+buttonNewCardPopup.addEventListener("click", () => openModal(newCardPopup));
 
 //Закрыть модальное окно по клику на крестик
-popupCloseButtonList.forEach((btn) => {
+buttonListClosePopup.forEach((btn) => {
   const closestPopup = btn.closest(".popup");
   btn.addEventListener("click", () => closeModal(closestPopup));
 });
