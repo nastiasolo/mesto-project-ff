@@ -14,6 +14,8 @@ function createCard(dataCard, profileId, deleteCard, likeCard, openImgModal) {
     dataCard.likes.length;
 
   const deleteButton = cardElement.querySelector(".card__delete-button");
+  console.log("хозяин", dataCard.owner);
+  console.log("Профиль айди", profileId);
 
   if (dataCard.owner._id !== profileId) {
     deleteButton.style.visibility = "hidden";

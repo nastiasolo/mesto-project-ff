@@ -1,3 +1,11 @@
+export const apiConfig = {
+  baseUrl: "https://nomoreparties.co/v1/wff-cohort-16",
+  headers: {
+    authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
+    "Content-Type": "application/json",
+  },
+};
+
 export const loadUserData = (apiConfig) => {
   return fetch(`${apiConfig.baseUrl}/users/me`, {
     headers: apiConfig.headers,
@@ -5,6 +13,7 @@ export const loadUserData = (apiConfig) => {
     if (res.ok) {
       return res.json();
     }
+    return Promise.reject(`Ошибка: ${res.status}`);
   });
 };
 
@@ -15,6 +24,7 @@ export const loadCardsData = (apiConfig) => {
     if (res.ok) {
       return res.json();
     }
+    return Promise.reject(`Ошибка: ${res.status}`);
   });
 };
 
@@ -30,7 +40,6 @@ export const sendProfileData = (nameInput, jobInput) => {
     if (res.ok) {
       return res.json();
     }
-
     return Promise.reject(`Ошибка: ${res.status}`);
   });
 };
@@ -46,6 +55,7 @@ export const sendProfileImage = (profilePicInput) => {
     if (res.ok) {
       return res.json();
     }
+    return Promise.reject(`Ошибка: ${res.status}`);
   });
 };
 
@@ -57,7 +67,12 @@ export const postNewCard = (placeNameInput, placeUrlInput) => {
       name: placeNameInput.value,
       link: placeUrlInput.value,
     }),
-  }).then((res) => res.json());
+  }).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  });
 };
 
 export const sendDeleteCard = (cardId) => {
@@ -68,6 +83,7 @@ export const sendDeleteCard = (cardId) => {
     if (res.ok) {
       return res.json();
     }
+    return Promise.reject(`Ошибка: ${res.status}`);
   });
 };
 
@@ -79,6 +95,7 @@ export const sendLikes = (cardId) => {
     if (res.ok) {
       return res.json();
     }
+    return Promise.reject(`Ошибка: ${res.status}`);
   });
 };
 
@@ -90,5 +107,6 @@ export const deleteLikes = (cardId) => {
     if (res.ok) {
       return res.json();
     }
+    return Promise.reject(`Ошибка: ${res.status}`);
   });
 };

@@ -3,6 +3,7 @@ import { createCard, deleteCard, likeCard } from "./card";
 import { openModal, closeModal } from "./modal";
 import { enableValidation, clearValidation } from "./validation";
 import {
+  apiConfig,
   loadUserData,
   loadCardsData,
   sendProfileData,
@@ -55,14 +56,6 @@ const validationConfig = {
   errorClass: "popup__input-error_active",
 };
 
-const apiConfig = {
-  baseUrl: "https://nomoreparties.co/v1/wff-cohort-16",
-  headers: {
-    authorization: "843b32f0-6603-4aba-82ae-11619430f8b3",
-    "Content-Type": "application/json",
-  },
-};
-
 //Открыть модальное окно редактирования профиля
 buttonOpenPopupProfile.addEventListener("click", () => {
   nameInput.value = profileTitle.textContent;
@@ -83,7 +76,6 @@ function openImgModal(cardData) {
   imgPopupPicture.alt = cardData.name;
   imgPopupDescription.textContent = cardData.name;
   openModal(imgPopup);
-  clearValidation(profilePictureForm, validationConfig);
 }
 
 Promise.all([loadUserData(apiConfig), loadCardsData(apiConfig)])
@@ -167,7 +159,7 @@ function handleAddForm(evt) {
         owner: { _id: result.owner._id },
       };
       placesList.prepend(
-        createCard(place, result.owner, deleteCard, likeCard, openImgModal)
+        createCard(place, place.owner._id, deleteCard, likeCard, openImgModal)
       );
       evt.target.reset();
       clearValidation(addForm, validationConfig);
